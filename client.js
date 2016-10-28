@@ -1,36 +1,32 @@
-let app_args = process.argv.slice(2);
+const http = require('http');
 let fs = require('fs');
 const url = require("url");
+
+let app_args = process.argv.slice(2);
 
 if(app_args.length == 0) {
 	require('./usage');
 }
 
-const http = require('http');
-
 function sendPost(post_url, post_data) {
+	let post_options = {
+		host: url.parse(post_url).hostname,
+		port: url.parse(post_url).port,
+		path: url.parse(post_url).pathname,
+		method: 'POST',
+		headers: {
+	        	'Content-Type': 'application/x-www-form-urlencoded',
+	          	'Content-Length': Buffer.byteLength(post_data)
+	      	}
+	};
+	let post_req = http.request(post_options, res => {
+		res.setEncoding('utf8');
+		res.on('data', function (chunk) { console.log('Response:\n' + chunk); }); 
+	});
 
-		let post_options = {
-			host: url.parse(post_url).hostname,
-			port: url.parse(post_url).port,
-			path: url.parse(post_url).pathname,
-			method: 'POST',
-			headers: {
-		        	'Content-Type': 'application/x-www-form-urlencoded',
-		          	'Content-Length': Buffer.byteLength(post_data)
-		      	}
-		};
-
-		 let post_req = http.request(post_options, res => {
-      			res.setEncoding('utf8');
-      			res.on('data', function (chunk) {
-          			console.log('Response:\n' + chunk);
-      			});
-		});
-
-  		// post the data
-  		post_req.write(post_data);
-  		post_req.end();
+	// post the data
+	post_req.write(post_data);
+	post_req.end();
 }
 
 
