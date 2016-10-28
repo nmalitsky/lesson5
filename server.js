@@ -9,24 +9,36 @@ function doOperation(operation, data) {
 	var res = "";
 	switch(operation) {
 		case 'registry':
-			storehouse[id] = { id: id, name: data.name, qty: data.qty }; // not check for repeat registry for object { name: data.name, qty: data.qty }
-			res = storehouse[id];
-			id++; // autoincrement field
+			if (!data.name || !data.qty) {
+				res = {status: 'error - incomplete inputs'};
+			} else {
+				storehouse[id] = { id: id, name: data.name, qty: data.qty }; // allow dublicate items in warehouse - it's not specify in technical task
+				res = storehouse[id];
+				id++; // autoincrement field
+			}
 			break;
 		case 'addition':
-			if(storehouse[data.id]) {
-				storehouse[data.id].qty = Number(storehouse[data.id].qty) + Number(data.qty);
-				res = storehouse[data.id];
+			if (!data.id || !data.qty) {
+				res = {status: 'error - incomplete inputs'};
 			} else {
-				res = `position with id=${data.id} not found for addition`;
+				if(storehouse[data.id]) {
+					storehouse[data.id].qty = Number(storehouse[data.id].qty) + Number(data.qty);
+					res = storehouse[data.id];
+				} else {
+					res = `position with id=${data.id} not found for addition`;
+				}
 			}
 			break;
 		case 'delete':
-			if(storehouse[data.id]) {
-				storehouse[data.id].qty = Math.max(0, Number(storehouse[data.id].qty) - Number(data.qty));
-				res = storehouse[data.id];
+			if (!data.id || !data.qty) {
+				res = {status: 'error - incomplete inputs'};
 			} else {
-				res = `position with id=${data.id} not found for delete`;
+				if(storehouse[data.id]) {
+					storehouse[data.id].qty = Math.max(0, Number(storehouse[data.id].qty) - Number(data.qty));
+					res = storehouse[data.id];
+				} else {
+					res = `position with id=${data.id} not found for delete`;
+				}
 			}
 			break;
 		case 'balance':
