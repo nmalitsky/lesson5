@@ -48,7 +48,7 @@ function handler(req, res) {
 	req.on('data', chunk => data += chunk);
 	req.on('end', () => {
 		let operation = url.parse(req.url).pathname.replace('/','');
-		let req_data = (req.method == 'POST') ? JSON.parse(data) : url.parse(req.url).query;
+		let req_data = (req.method == 'POST') ? JSON.parse(data) : url.parse(req.url, true).query;
 		let res_data = JSON.stringify(doOperation(operation, req_data), null, 2);
 
 		res.writeHead(200, 'OK', {'Content-Type': 'application/json'});
